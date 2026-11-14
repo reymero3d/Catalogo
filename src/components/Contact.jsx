@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const WHATSAPP_NUMBER = '5491123456789'
+const WHATSAPP_NUMBER = '5491167994767'
 
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', message: '' })

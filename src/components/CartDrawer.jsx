@@ -1,7 +1,7 @@
 import { useCart } from '../context/CartContext'
 import { formatPrice } from '../data/products'
 
-const WHATSAPP_NUMBER = '5491123456789' // reemplazar con tu número
+const WHATSAPP_NUMBER = '5491167994767' // reemplazar con tu número
 
 export default function CartDrawer() {
   const { items, open, setOpen, remove, updateQty, clear, total } = useCart()
