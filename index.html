@@ -10,15 +10,12 @@
   <body>
     <div id="root"></div>
     <script>
-      // Restore path from sessionStorage (GitHub Pages SPA fallback)
+      // Restore route from hash (GitHub Pages SPA fallback)
       (function () {
-        var redirect = sessionStorage.getItem('redirect');
-        if (redirect) {
-          sessionStorage.removeItem('redirect');
-          var path = redirect.replace(window.location.origin, '');
-          if (path && path !== '/') {
-            window.history.replaceState(null, null, path);
-          }
+        var hash = window.location.hash;
+        if (hash && hash.length > 1) {
+          var route = hash.substring(1);
+          window.history.replaceState(null, null, '/Catalogo/' + route);
         }
       })();
     </script>

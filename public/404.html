@@ -4,9 +4,13 @@
     <meta charset="UTF-8" />
     <title>reymero3d</title>
     <script>
-      // SPA fallback for GitHub Pages: save the original path and redirect to root
-      sessionStorage.setItem('redirect', location.href);
-      location.replace('/Catalogo/');
+      // SPA fallback for GitHub Pages: redirect preserving the intended route in the hash
+      var path = window.location.pathname.replace(/^\/Catalogo\/?/, '');
+      if (path) {
+        location.replace('/Catalogo/#' + path);
+      } else {
+        location.replace('/Catalogo/');
+      }
     </script>
   </head>
   <body></body>
