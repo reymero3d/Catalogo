@@ -13,6 +13,18 @@
       "image": "/productos/2025-08-19_673842ba7b4a58.webp",
       "description": "GOKU DAIMA SSJ2",
       "category": "figuras"
+    },
+    {
+      "size": "25CM",
+      "color": "Cuerpo: Amarillo Pico y vientre: Marrón claro Pokébola: Rojo y Blanco Anillo y pelo: Negro",
+      "colorMode": "fijo",
+      "material": "PLA",
+      "price": 15000,
+      "name": "Psyduck – Edición Disparo en la Cabeza con Pokébola",
+      "featured": false,
+      "image": "/productos/778f8d0cc8ddb001-1-.webp",
+      "description": "Psyduck – Edición Disparo en la Cabeza con Pokébola",
+      "category": "figuras"
     }
   ]
 }
