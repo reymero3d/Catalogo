@@ -10,7 +10,12 @@ export const categories = [
   { id: 'utilitarios', name: 'Utilitarios', icon: '🔧' },
 ]
 
-export const products = data.products
+export const products = data.products.map((p, i) => ({
+  ...p,
+  id: p.id ?? i + 1,
+  stock: p.stock ?? 99,
+  colorMode: p.colorMode ?? 'elegir',
+}))
 
 export const formatPrice = (n) =>
   new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(n)

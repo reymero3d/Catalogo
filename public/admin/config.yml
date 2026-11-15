@@ -20,7 +20,6 @@ collections:
             widget: "list"
             summary: "{{fields.name}} — ${{fields.price}}"
             fields:
-              - { label: "ID", name: "id", widget: "number", value_type: "int" }
               - { label: "Nombre", name: "name", widget: "string" }
               - label: "Categoría"
                 name: "category"
@@ -35,8 +34,14 @@ collections:
               - { label: "Precio", name: "price", widget: "number", value_type: "int" }
               - { label: "Descripción", name: "description", widget: "text" }
               - { label: "Material", name: "material", widget: "string" }
-              - { label: "Color", name: "color", widget: "string" }
+              - label: "Tipo de color"
+                name: "colorMode"
+                widget: "select"
+                default: "elegir"
+                options:
+                  - { label: "El cliente elige el color", value: "elegir" }
+                  - { label: "Color fijo (no se puede cambiar)", value: "fijo" }
+              - { label: "Color", name: "color", widget: "string", hint: "Si es 'fijo', este es el color del producto. Si es 'a elección', es un color sugerido." }
               - { label: "Tamaño", name: "size", widget: "string" }
               - { label: "Imagen", name: "image", widget: "image" }
               - { label: "Destacado", name: "featured", widget: "boolean", default: false }
-              - { label: "Stock", name: "stock", widget: "number", value_type: "int" }

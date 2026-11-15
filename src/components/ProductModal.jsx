@@ -7,11 +7,14 @@ export default function ProductModal({ product, onClose }) {
   const [qty, setQty] = useState(1)
   const [note, setNote] = useState('')
   const [color, setColor] = useState(product ? product.color : '')
+  const colorEditable = !product || product.colorMode !== 'fijo'
 
   if (!product) return null
 
   const handleAdd = () => {
-    add(product, qty, note ? `${note}${color ? ' · Color: ' + color : ''}` : (color ? 'Color: ' + color : ''))
+    const colorNote = colorEditable && color ? `Color: ${color}` : ''
+    const fullNote = [note, colorNote].filter(Boolean).join(' · ')
+    add(product, qty, fullNote)
     onClose()
   }
 
@@ -45,22 +48,38 @@ export default function ProductModal({ product, onClose }) {
                 <div className="text-slate-500 text-xs uppercase tracking-wide">Tamaño</div>
                 <div className="font-semibold text-slate-900 mt-0.5">{product.size}</div>
               </div>
-              <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-100">
-                <div className="text-slate-500 text-xs uppercase tracking-wide">Stock</div>
-                <div className="font-semibold text-slate-900 mt-0.5">{product.stock} disponibles</div>
-              </div>
+              {product.stock < 99 ? (
+                <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-100">
+                  <div className="text-slate-500 text-xs uppercase tracking-wide">Stock</div>
+                  <div className="font-semibold text-slate-900 mt-0.5">{product.stock} disponibles</div>
+                </div>
+              ) : (
+                <div className="bg-emerald-50 rounded-xl p-3.5 border border-emerald-100">
+                  <div className="text-emerald-600 text-xs uppercase tracking-wide">Disponibilidad</div>
+                  <div className="font-semibold text-emerald-700 mt-0.5">Disponible</div>
+                </div>
+              )}
             </div>
 
-            <div className="mt-5">
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Color preferido</label>
-              <input
-                type="text"
-                value={color}
-                onChange={(e) => setColor(e.target.value)}
-                placeholder="Ej: Negro, Blanco, Rojo..."
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-              />
-            </div>
+            {colorEditable ? (
+              <div className="mt-5">
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Color preferido</label>
+                <input
+                  type="text"
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  placeholder="Ej: Negro, Blanco, Rojo..."
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                />
+                <p className="text-xs text-slate-400 mt-1">Podés elegir el color que prefieras.</p>
+              </div>
+            ) : (
+              <div className="mt-5 bg-slate-50 rounded-xl p-3.5 border border-slate-100">
+                <div className="text-slate-500 text-xs uppercase tracking-wide">Color</div>
+                <div className="font-semibold text-slate-900 mt-0.5">{product.color}</div>
+                <p className="text-xs text-slate-400 mt-1">Color fijo, no se puede cambiar.</p>
+              </div>
+            )}
 
             <div className="mt-3">
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Personalización / notas</label>
