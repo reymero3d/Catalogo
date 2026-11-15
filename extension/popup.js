@@ -2,7 +2,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const content = document.getElementById('content');
 
-  // Obtener el tab activo
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
   if (!tab || !tab.url || !tab.url.includes('makerworld.com')) {
@@ -10,12 +9,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // Pedir extracción al content script
   let data;
   try {
     data = await chrome.tabs.sendMessage(tab.id, { action: 'extract' });
   } catch (e) {
-    // Content script no inyectado; inyectar manualmente
     try {
       await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['content.js'] });
       data = await chrome.tabs.sendMessage(tab.id, { action: 'extract' });
@@ -26,11 +23,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   if (!data || !data.name) {
-    content.innerHTML = '<p class="status error">No se encontraron datos del modelo.</p>';
+    let html = '<p class="status error">No se encontraron datos del modelo.</p>';
+    if (data && data.debug) {
+      html += '<details style="margin-top:8px;font-size:11px;"><summary>Debug</summary>';
+      html += '<pre style="white-space:pre-wrap;word-break:break-all;max-height:300px;overflow:auto;">' + JSON.stringify(data.debug, null, 2) + '</pre>';
+      html += '</details>';
+    }
+    content.innerHTML = html;
     return;
   }
 
-  // Mostrar preview
+  // Mostrar perfiles A1 encontrados
+  const a1Profiles = (data.debug.allInstances || []).filter((p) => p.isA1);
+  const allProfiles = data.debug.allInstances || [];
+
   let html = '';
   if (data.image) {
     html += `<img class="preview" src="${data.image}" alt="${data.name}" />`;
@@ -38,11 +44,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   html += `<div class="field"><div class="label">Nombre</div><div class="value">${data.name}</div></div>`;
   html += `<div class="field"><div class="label">Peso</div><div class="value">${data.grams} g</div></div>`;
   html += `<div class="field"><div class="label">Tiempo</div><div class="value">${data.hours}h ${data.minutes}m</div></div>`;
-  html += `<div class="field"><div class="label">URL</div><div class="value" style="font-size:10px">${data.url}</div></div>`;
 
-  // Botón: copiar JSON al portapapeles
+  // Selector de perfil si hay varios
+  if (allProfiles.length > 1) {
+    html += `<div class="field"><div class="label">Perfil (${allProfiles.length} disponibles${a1Profiles.length ? ', ' + a1Profiles.length + ' para A1' : ''})</div>`;
+    html += `<select id="profileSelect" style="width:100%;padding:6px;border-radius:6px;border:1px solid #cbd5e1;font-size:12px;">`;
+    allProfiles.forEach((p, i) => {
+      const marker = p.isA1 ? ' ⭐ A1' : '';
+      const sel = (p.title === data.debug.chosen?.title) ? 'selected' : '';
+      html += `<option value="${i}" ${sel}>${p.title} (${p.weight}g)${marker}</option>`;
+    });
+    html += `</select></div>`;
+  }
+
   html += `<button class="btn btn-primary" id="copyBtn">📋 Copiar datos (JSON)</button>`;
-  // Botón: abrir admin con datos en URL
   const params = new URLSearchParams({
     name: data.name,
     image: data.image,
@@ -56,14 +71,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   content.innerHTML = html;
 
-  // Copiar JSON
+  // Si cambia el perfil seleccionado, actualizar datos
+  const profileSelect = document.getElementById('profileSelect');
+  if (profileSelect) {
+    profileSelect.addEventListener('change', () => {
+      const idx = parseInt(profileSelect.value);
+      const prof = allProfiles[idx];
+      if (prof) {
+        // Actualizar grams en el display (no re-extraemos, usamos el debug)
+        document.querySelector('.field:nth-child(3) .value').textContent = prof.weight + ' g';
+      }
+    });
+  }
+
   document.getElementById('copyBtn').addEventListener('click', async () => {
     const json = JSON.stringify(data, null, 2);
     await navigator.clipboard.writeText(json);
     document.getElementById('statusMsg').textContent = '✅ Datos copiados al portapapeles';
   });
 
-  // Abrir en catálogo
   document.getElementById('openBtn').addEventListener('click', () => {
     const url = `https://reymero3d.netlify.app/agregar?${params.toString()}`;
     chrome.tabs.create({ url });

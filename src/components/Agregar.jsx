@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { categories } from '../data/products'
 import { formatPrice } from '../data/products'
 
@@ -16,6 +16,27 @@ function calcPrice({ grams, hours, minutes, priceKg, priceKwh, watts, lifespan, 
 }
 
 export default function Agregar({ onNavigate }) {
+  const [user, setUser] = useState(null)
+  const [authChecked, setAuthChecked] = useState(false)
+
+  useEffect(() => {
+    const checkAuth = () => {
+      if (window.netlifyIdentity) {
+        const u = window.netlifyIdentity.currentUser()
+        setUser(u)
+        setAuthChecked(true)
+        if (!u) {
+          window.netlifyIdentity.on('login', (u) => { setUser(u); setAuthChecked(true) })
+          window.netlifyIdentity.on('logout', () => { setUser(null) })
+        }
+      } else {
+        // Esperar a que cargue el widget
+        setTimeout(checkAuth, 500)
+      }
+    }
+    checkAuth()
+  }, [])
+
   const params = new URLSearchParams(window.location.search)
 
   const [form, setForm] = useState({
@@ -148,6 +169,36 @@ export default function Agregar({ onNavigate }) {
     }
     navigator.clipboard.writeText(JSON.stringify(newProduct, null, 2))
     setStatus('✅ JSON copiado al portapapeles. Pegalo en el admin.')
+  }
+
+  if (!authChecked) {
+    return (
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+        <div className="text-4xl mb-4">⏳</div>
+        <p className="text-slate-500">Verificando acceso...</p>
+      </section>
+    )
+  }
+
+  if (!user) {
+    return (
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center animate-fade-in">
+        <div className="text-5xl mb-4">🔒</div>
+        <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Acceso restringido</h2>
+        <p className="text-slate-500 mb-6">Esta página es solo para administradores. Iniciá sesión para continuar.</p>
+        <button
+          onClick={() => window.netlifyIdentity && window.netlifyIdentity.open()}
+          className="px-6 py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition shadow-lg"
+        >
+          Iniciar sesión
+        </button>
+        <div className="mt-6">
+          <button onClick={() => onNavigate('home')} className="text-indigo-600 font-semibold hover:underline">
+            ← Volver al inicio
+          </button>
+        </div>
+      </section>
+    )
   }
 
   return (
