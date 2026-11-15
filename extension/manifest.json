@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Reymero3D - Importar de MakerWorld",
+  "version": "1.0.0",
+  "description": "Extrae datos de modelos de MakerWorld (nombre, imagen, peso, tiempo) y los envía al catálogo reymero3d para calcular el precio.",
+  "permissions": ["activeTab", "scripting", "clipboardWrite", "storage"],
+  "host_permissions": ["https://makerworld.com/*", "https://reymero3d.netlify.app/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Importar a reymero3d"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://makerworld.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}

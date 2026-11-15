@@ -5,6 +5,7 @@ import Hero from './components/Hero'
 import Catalog from './components/Catalog'
 import About from './components/About'
 import Contact from './components/Contact'
+import Agregar from './components/Agregar'
 import Footer from './components/Footer'
 import CartDrawer from './components/CartDrawer'
 import ProductModal from './components/ProductModal'
@@ -12,7 +13,13 @@ import ProductCard from './components/ProductCard'
 import { products } from './data/products'
 
 function AppInner() {
-  const [page, setPage] = useState('home')
+  const initialPage = (() => {
+    const path = window.location.pathname.toLowerCase()
+    const search = window.location.search
+    if (path.includes('agregar') || search.includes('grams=') || search.includes('name=')) return 'agregar'
+    return 'home'
+  })()
+  const [page, setPage] = useState(initialPage)
   const [product, setProduct] = useState(null)
 
   const navigate = (p) => {
@@ -74,6 +81,7 @@ function AppInner() {
         {page === 'catalog' && <Catalog onOpenProduct={setProduct} />}
         {page === 'about' && <About />}
         {page === 'contact' && <Contact />}
+        {page === 'agregar' && <Agregar onNavigate={navigate} />}
       </main>
       <Footer onNavigate={navigate} />
       <CartDrawer />
