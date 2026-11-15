@@ -29,13 +29,14 @@ function AppInner() {
         {page === 'home' && (
           <>
             <Hero onNavigate={navigate} />
-            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-              <div className="flex items-end justify-between mb-6">
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+              <div className="flex items-end justify-between mb-8">
                 <div>
-                  <h2 className="text-2xl font-extrabold text-slate-900">Destacados</h2>
-                  <p className="text-slate-500 mt-1">Nuestros productos más elegidos</p>
+                  <span className="inline-block px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold mb-2">Destacados</span>
+                  <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">Nuestros más elegidos</h2>
+                  <p className="text-slate-500 mt-1.5">Piezas que nuestros clientes aman</p>
                 </div>
-                <button onClick={() => navigate('catalog')} className="text-indigo-600 font-semibold hover:underline">
+                <button onClick={() => navigate('catalog')} className="hidden sm:inline-flex items-center gap-1 text-indigo-600 font-semibold hover:gap-2 transition-all">
                   Ver todo →
                 </button>
               </div>
@@ -44,19 +45,26 @@ function AppInner() {
                   <ProductCard key={p.id} product={p} onOpen={setProduct} />
                 ))}
               </div>
+              <div className="sm:hidden mt-6 text-center">
+                <button onClick={() => navigate('catalog')} className="text-indigo-600 font-semibold hover:underline">
+                  Ver todo el catálogo →
+                </button>
+              </div>
             </section>
 
             <section className="bg-white border-y border-slate-200">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid md:grid-cols-3 gap-8 text-center">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 grid md:grid-cols-3 gap-8">
                 {[
-                  { icon: '🎨', t: 'Diseño a medida', d: 'Personalizamos cada pieza según tu idea.' },
-                  { icon: '⚡', t: 'Producción rápida', d: 'Entregas en 24 a 72 horas.' },
-                  { icon: '📦', t: 'Envíos a todo el país', d: 'Coordinamos el envío por WhatsApp.' },
+                  { icon: '🎨', t: 'Diseño a medida', d: 'Personalizamos cada pieza según tu idea. Envíanos tu archivo o foto.' },
+                  { icon: '⚡', t: 'Producción rápida', d: 'Entregas en 24 a 72 horas. Seguimiento por WhatsApp.' },
+                  { icon: '📦', t: 'Envíos a todo el país', d: 'Coordinamos el envío y el pago por WhatsApp.' },
                 ].map((f) => (
-                  <div key={f.t}>
-                    <div className="text-4xl">{f.icon}</div>
-                    <h3 className="mt-3 font-bold text-slate-900">{f.t}</h3>
-                    <p className="mt-1 text-sm text-slate-500">{f.d}</p>
+                  <div key={f.t} className="flex gap-4 items-start p-5 rounded-2xl hover:bg-slate-50 transition">
+                    <div className="text-3xl shrink-0">{f.icon}</div>
+                    <div>
+                      <h3 className="font-bold text-slate-900">{f.t}</h3>
+                      <p className="mt-1 text-sm text-slate-500 leading-relaxed">{f.d}</p>
+                    </div>
                   </div>
                 ))}
               </div>
