@@ -16,15 +16,28 @@
     },
     {
       "size": "25CM",
-      "color": "Cuerpo: Amarillo Pico y vientre: Marrón claro Pokébola: Rojo y Blanco Anillo y pelo: Negro",
+      "color": "Cuerpo: Amarillo Pico y vientre: MarrÃ³n claro PokÃ©bola: Rojo y Blanco Anillo y pelo: Negro",
       "colorMode": "fijo",
       "material": "PLA",
       "price": 15000,
-      "name": "Psyduck – Edición Disparo en la Cabeza con Pokébola",
+      "name": "Psyduck â EdiciÃ³n Disparo en la Cabeza con PokÃ©bola",
       "featured": false,
       "image": "/productos/778f8d0cc8ddb001-1-.webp",
-      "description": "Psyduck – Edición Disparo en la Cabeza con Pokébola",
+      "description": "Psyduck â EdiciÃ³n Disparo en la Cabeza con PokÃ©bola",
       "category": "figuras"
+    },
+    {
+      "id": 2,
+      "name": "Eevee golpeado por una pokebola (SIN AMS）",
+      "category": "figuras",
+      "price": 13961,
+      "description": "",
+      "material": "PLA",
+      "color": "",
+      "colorMode": "elegir",
+      "size": "",
+      "image": "https://makerworld.bblmw.com/makerworld/model/US3914dd12bb657b/1132694910/instance/e6fa1d459f47c01c.jpg",
+      "featured": true
     }
   ]
 }
