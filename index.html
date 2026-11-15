@@ -9,6 +9,19 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Restore path from sessionStorage (GitHub Pages SPA fallback)
+      (function () {
+        var redirect = sessionStorage.getItem('redirect');
+        if (redirect) {
+          sessionStorage.removeItem('redirect');
+          var path = redirect.replace(window.location.origin, '');
+          if (path && path !== '/') {
+            window.history.replaceState(null, null, path);
+          }
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
