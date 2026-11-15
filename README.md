@@ -27,48 +27,47 @@ npm run build
 
 Los archivos estáticos quedan en `dist/`.
 
-## Alojamiento gratuito (elegí uno)
+## Alojamiento gratuito (GitHub Pages — recomendado)
 
-### Opción 1 — Netlify (más fácil, recomendado)
-1. Creá cuenta en https://netlify.com
-2. "Add new site → Import an existing project" conectando tu repo de GitHub, **o** arrastrá la carpeta `dist/` a https://app.netlify.com/drop
-3. Build command: `npm run build` · Publish directory: `dist`
-4. Listo, te da una URL `https://reymero3d.netlify.app` (podés cambiar el nombre).
+El proyecto ya incluye un workflow de GitHub Actions (`.github/workflows/deploy.yml`) que despliega automáticamente.
 
-### Opción 2 — Vercel
-1. https://vercel.com → Import Git Repository.
-2. Framework preset: Vite. Build command `npm run build`, output `dist`.
+1. Subí el repo a GitHub (si no lo hiciste).
+2. En GitHub: **Settings → Pages → Source: GitHub Actions**.
+3. Cada `git push` a `main` dispara el deploy automáticamente.
+4. Tu sitio queda en `https://TU_USUARIO.github.io/Catalogo/` (o con dominio custom).
 
-### Opción 3 — GitHub Pages
-1. Subí el repo a GitHub.
-2. En Settings → Pages → Source: GitHub Actions.
-3. Usá el workflow de Vite (https://vitejs.dev/guide/static-deploy.html#github-pages).
-4. O deploy manual: `npm run build` y subí `dist/` a la rama `gh-pages`.
+### Otras opciones gratuitas
 
-### Opción 4 — Cloudflare Pages
-1. https://pages.cloudflare.com → Create project → conectá repo.
-2. Build command `npm run build`, output `dist`.
+- **Vercel:** https://vercel.com → Import Git Repository. Preset Vite, build `npm run build`, output `dist`.
+- **Cloudflare Pages:** https://pages.cloudflare.com → conectá repo. Build `npm run build`, output `dist`.
+- **Netlify:** gratuito pero con límite de build minutes (300/mes). Si se exceden, los deploys se pausan.
 
-## Panel de administración (subir productos desde la web)
+## Panel de administración (`/admin`)
 
-El sitio incluye **Decap CMS** en `/admin` para que puedas agregar/editar productos (imagen, precio, descripción, stock, etc.) desde el navegador, sin tocar código.
+El sitio incluye una página `/admin` (protegida por login de Netlify Identity en Netlify, o accesible directamente en otros hosts) para agregar productos con calculadora de precios integrada.
 
-### Activarlo en Netlify (una sola vez)
+### Funcionalidades
 
-1. Subí el proyecto a un repositorio de GitHub (si aún no lo hiciste).
-2. En Netlify: **Site settings → Build & deploy → Link to Git repository** y seleccioná tu repo.
-   - Build command: `npm run build` · Publish directory: `dist`.
-3. **Site settings → Identity → Enable Identity**.
-4. En la misma sección, **Services → Git Gateway → Enable Git Gateway**.
-5. **Identity → Invite users** → ingresá tu email y aceptá la invitación que te llega.
+- **Calculadora de costos 3D** integrada (material, luz, desgaste, margen, insumos, multiplicador).
+- **Importar desde MakerWorld** con la extensión de navegador (extrae nombre, imagen, peso, tiempo).
+- **Guardar directo a GitHub** vía API (requiere un Personal Access Token con scope `repo`).
+- **Copiar JSON** para pegar en el admin de Decap CMS (si lo usás).
 
-### Usarlo
+### Configurar el token de GitHub
 
-- Entrá a `https://reymero3d.netlify.app/admin/` e iniciá sesión.
-- En "Productos" podés **agregar, editar o eliminar** productos, subir imágenes (se guardan en `public/productos/`), cambiar precio, descripción, stock, etc.
-- Cada cambio genera un commit en tu repo y Netlify **redeploya automáticamente** el sitio.
+1. GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic) → Generate new token.
+2. Seleccioná scope `repo` → Generate.
+3. Entrá a `/admin` en tu sitio → pegá el token en el campo "GitHub Personal Access Token" → "Guardar token".
+4. El token se guarda en tu navegador (localStorage). Solo se configura una vez.
 
-> Sin conectar el repo a Netlify y activar Identity + Git Gateway, el panel `/admin` no podrá guardar cambios.
+### Extensión de navegador para MakerWorld
+
+La carpeta `extension/` contiene una extensión de Chrome/Edge que extrae datos de modelos de MakerWorld.
+
+1. Abrí `chrome://extensions/` → activá "Modo de desarrollador".
+2. "Cargar descomprimida" → seleccioná la carpeta `extension/`.
+3. Abrí un modelo en MakerWorld → clic en el icono de la extensión → "Abrir en catálogo".
+4. Se abre `/agregar` con los datos pre-rellenados y el precio calculado.
 
 ## Personalización importante
 
