@@ -1,3 +1,17 @@
 {
-  "products": []
+  "products": [
+    {
+      "id": 1,
+      "name": "Juguete de dragón Charizard enojado de Pokemon",
+      "category": "figuras",
+      "price": 2718,
+      "description": "",
+      "material": "PLA",
+      "color": "",
+      "colorMode": "elegir",
+      "size": "",
+      "image": "https://makerworld.bblmw.com/makerworld/model/USccef8767d0dba8/1110819516/instance/817d1a8f4bc84ea5.jpg",
+      "featured": false
+    }
+  ]
 }
