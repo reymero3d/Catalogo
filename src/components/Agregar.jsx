@@ -18,6 +18,11 @@ function calcPrice({ grams, hours, minutes, priceKg, priceKwh, watts, lifespan, 
 export default function Agregar({ onNavigate }) {
   const params = new URLSearchParams(window.location.search)
 
+  const [token, setToken] = useState(localStorage.getItem('gh_token') || '')
+  const [tokenInput, setTokenInput] = useState('')
+  const [authStatus, setAuthStatus] = useState('checking') // checking | ok | need | invalid
+  const [authError, setAuthError] = useState('')
+
   const [form, setForm] = useState({
     name: params.get('name') || '',
     category: 'figuras',
@@ -46,22 +51,59 @@ export default function Agregar({ onNavigate }) {
     qty: 1,
   })
 
-  const [githubToken, setGithubToken] = useState(localStorage.getItem('gh_token') || '')
   const [status, setStatus] = useState('')
   const [saving, setSaving] = useState(false)
+
+  // Verificar token al montar
+  useEffect(() => {
+    if (!token) { setAuthStatus('need'); return }
+    verifyToken(token)
+  }, [])
+
+  const verifyToken = async (t) => {
+    setAuthStatus('checking')
+    setAuthError('')
+    try {
+      const res = await fetch('https://api.github.com/user', {
+        headers: { Authorization: `token ${t}`, Accept: 'application/vnd.github.v3+json' },
+      })
+      if (res.ok) {
+        const u = await res.json()
+        setAuthStatus('ok')
+        setStatus(`✅ Bienvenido, ${u.login}`)
+      } else {
+        setAuthStatus('invalid')
+        setAuthError('Token inválido o sin permisos. Ingresá un token válido.')
+      }
+    } catch (e) {
+      setAuthStatus('invalid')
+      setAuthError('Error al verificar el token.')
+    }
+  }
+
+  const saveToken = () => {
+    const t = tokenInput.trim()
+    if (!t) { setAuthError('Ingresá un token.'); return }
+    localStorage.setItem('gh_token', t)
+    setToken(t)
+    verifyToken(t)
+  }
+
+  const logout = () => {
+    localStorage.removeItem('gh_token')
+    setToken('')
+    setTokenInput('')
+    setAuthStatus('need')
+    setStatus('')
+  }
 
   const result = useMemo(() => calcPrice({ ...form, ...calc }), [form, calc])
 
   const updateForm = (k, v) => setForm((f) => ({ ...f, [k]: v }))
   const updateCalc = (k, v) => setCalc((c) => ({ ...c, [k]: v === '' ? 0 : Number(v) }))
 
-  const saveToken = () => {
-    localStorage.setItem('gh_token', githubToken)
-    setStatus('✅ Token guardado')
-  }
-
   const saveProduct = async () => {
-    if (!githubToken) {
+    if (!token) {
       setStatus('❌ Necesitás configurar tu GitHub token primero (abajo).')
       return
     }
@@ -78,7 +120,7 @@ export default function Agregar({ onNavigate }) {
 
       // 1. Obtener archivo actual
       const getRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
-        headers: { Authorization: `token ${githubToken}`, Accept: 'application/vnd.github.v3+json' },
+        headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
       })
       if (!getRes.ok) throw new Error('No se pudo leer products.json: ' + getRes.status)
       const fileData = await getRes.json()
@@ -110,7 +152,7 @@ export default function Agregar({ onNavigate }) {
       const putRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
         method: 'PUT',
         headers: {
-          Authorization: `token ${githubToken}`,
+          Authorization: `token ${token}`,
           Accept: 'application/vnd.github.v3+json',
           'Content-Type': 'application/json',
         },
@@ -148,6 +190,42 @@ export default function Agregar({ onNavigate }) {
     }
     navigator.clipboard.writeText(JSON.stringify(newProduct, null, 2))
     setStatus('✅ JSON copiado al portapapeles. Pegalo en el admin.')
+  }
+
+  if (authStatus !== 'ok') {
+    return (
+      <section className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-20 animate-fade-in">
+        <div className="text-center mb-6">
+          <div className="text-5xl mb-4">🔒</div>
+          <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Acceso restringido</h2>
+          <p className="text-slate-500">Ingresá tu GitHub Personal Access Token para acceder al panel de administración.</p>
+        </div>
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+          {authError && <p className="text-sm text-red-600">{authError}</p>}
+          {authStatus === 'checking' && <p className="text-sm text-slate-500">Verificando...</p>}
+          <div className="flex gap-2">
+            <input
+              type="password"
+              value={tokenInput}
+              onChange={(e) => setTokenInput(e.target.value)}
+              placeholder="ghp_... o github_pat_..."
+              className="flex-1 px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500"
+            />
+            <button onClick={saveToken} className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition">
+              Verificar
+            </button>
+          </div>
+          <p className="text-xs text-slate-500">
+            Creá un token en GitHub → Settings → Developer settings → Personal access tokens → con scope <code>repo</code>.
+          </p>
+        </div>
+        <div className="mt-6 text-center">
+          <button onClick={() => onNavigate('home')} className="text-indigo-600 font-semibold hover:underline">
+            ← Volver al inicio
+          </button>
+        </div>
+      </section>
+    )
   }
 
   return (
@@ -301,22 +379,37 @@ export default function Agregar({ onNavigate }) {
       <div className="mt-6 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
         <h3 className="font-bold text-slate-900 text-lg">Guardar producto</h3>
 
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">GitHub Personal Access Token</label>
-          <div className="flex gap-2">
-            <input
-              type="password"
-              value={githubToken}
-              onChange={(e) => setGithubToken(e.target.value)}
-              placeholder="ghp_... o github_pat_..."
-              className="flex-1 px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500"
-            />
-            <button onClick={saveToken} className="px-4 py-2 rounded-xl bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300 transition">
-              Guardar token
-            </button>
+        {authStatus !== 'ok' && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-3">
+            <p className="text-sm font-medium text-amber-800">
+              🔒 Ingresá tu GitHub Personal Access Token para acceder al panel.
+            </p>
+            {authError && <p className="text-sm text-red-600">{authError}</p>}
+            {authStatus === 'checking' && <p className="text-sm text-slate-500">Verificando...</p>}
+            <div className="flex gap-2">
+              <input
+                type="password"
+                value={tokenInput}
+                onChange={(e) => setTokenInput(e.target.value)}
+                placeholder="ghp_... o github_pat_..."
+                className="flex-1 px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500"
+              />
+              <button onClick={saveToken} className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition">
+                Verificar
+              </button>
+            </div>
+            <p className="text-xs text-slate-500">
+              Creá un token en GitHub → Settings → Developer settings → Personal access tokens → con scope <code>repo</code>.
+            </p>
           </div>
-          <p className="text-xs text-slate-400 mt-1">Se guarda en tu navegador (localStorage). Solo necesitás configurarlo una vez.</p>
-        </div>
+        )}
+
+        {authStatus === 'ok' && (
+          <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-xl p-3">
+            <span className="text-sm font-medium text-green-700">✅ Token verificado. Podés guardar productos.</span>
+            <button onClick={logout} className="text-xs text-red-500 hover:text-red-700 font-medium">Cerrar sesión</button>
+          </div>
+        )}
 
         <div className="flex gap-3">
           <button
