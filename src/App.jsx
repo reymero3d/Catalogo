@@ -16,7 +16,7 @@ function AppInner() {
   const initialPage = (() => {
     const path = window.location.pathname.toLowerCase()
     const search = window.location.search
-    if (path.includes('agregar') || search.includes('grams=') || search.includes('name=')) return 'agregar'
+    if (path.includes('admin') || path.includes('agregar') || search.includes('grams=') || search.includes('name=')) return 'agregar'
     return 'home'
   })()
   const [page, setPage] = useState(initialPage)

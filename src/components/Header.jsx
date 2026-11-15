@@ -27,7 +27,7 @@ export default function Header({ onNavigate }) {
               { id: 'catalog', label: 'Catálogo' },
               { id: 'about', label: 'Nosotros' },
               { id: 'contact', label: 'Contacto' },
-              { id: 'agregar', label: 'Importar' },
+              { id: 'agregar', label: 'Admin' },
             ].map((n) => (
               <button
                 key={n.id}
@@ -74,7 +74,7 @@ export default function Header({ onNavigate }) {
               { id: 'catalog', label: 'Catálogo' },
               { id: 'about', label: 'Nosotros' },
               { id: 'contact', label: 'Contacto' },
-              { id: 'agregar', label: 'Importar' },
+              { id: 'agregar', label: 'Admin' },
             ].map((n) => (
               <button key={n.id} onClick={() => nav(n.id)} className="text-left px-3 py-2 rounded-lg hover:bg-indigo-50 hover:text-indigo-600">
                 {n.label}
