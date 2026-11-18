@@ -67,6 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     url: data.url,
   });
   html += `<button class="btn btn-secondary" id="openBtn">🔗 Abrir en catálogo</button>`;
+  html += `<button class="btn btn-secondary" id="openCalcBtn">Abrir en calculadora</button>`;
   html += `<p class="status" id="statusMsg"></p>`;
 
   content.innerHTML = html;
@@ -78,8 +79,30 @@ document.addEventListener('DOMContentLoaded', async () => {
       const idx = parseInt(profileSelect.value);
       const prof = allProfiles[idx];
       if (prof) {
-        // Actualizar grams en el display (no re-extraemos, usamos el debug)
-        document.querySelector('.field:nth-child(3) .value').textContent = prof.weight + ' g';
+        data.grams = prof.weight || data.grams;
+        // Tiempo
+        if (typeof prof.prediction === 'number' && prof.prediction > 0) {
+          data.hours = Math.floor(prof.prediction / 3600);
+          data.minutes = Math.floor((prof.prediction % 3600) / 60);
+        } else {
+          const ext = prof.extentionData || {};
+          for (const key of Object.keys(ext)) {
+            if (/time|hour|minute|duration/i.test(key)) {
+              const val = ext[key];
+              if (typeof val === 'number') {
+                if (val > 3600) { data.hours = Math.floor(val / 3600); data.minutes = Math.floor((val % 3600) / 60); }
+                else if (val > 60) { data.hours = Math.floor(val / 60); data.minutes = val % 60; }
+              } else if (typeof val === 'string') {
+                const m = val.match(/(\\d+)\\s*h(?:\\s*(\\d+)\\s*m)?/i);
+                if (m) { data.hours = parseInt(m[1]); data.minutes = m[2] ? parseInt(m[2]) : 0; }
+              }
+            }
+          }
+        }
+        const gEl = document.querySelector('.field:nth-child(3) .value');
+        if (gEl) gEl.textContent = data.grams + ' g';
+        const tEl = document.querySelector('.field:nth-child(4) .value');
+        if (tEl) tEl.textContent = data.hours + 'h ' + data.minutes + 'm';
       }
     });
   }
@@ -94,4 +117,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const url = `https://reymero3d.netlify.app/agregar?${params.toString()}`;
     chrome.tabs.create({ url });
   });
+
+  const openCalcBtn = document.getElementById('openCalcBtn');
+  if (openCalcBtn) {
+    openCalcBtn.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(JSON.stringify(data, null, 2)); } catch (e) {}
+      chrome.tabs.create({ url: 'https://reymero3d.github.io/Calculadora-3D-/index.html' });
+      const sm = document.getElementById('statusMsg');
+      if (sm) sm.textContent = 'Datos copiados. En la calculadora usá "Pegar desde portapapeles".';
+    });
+  }
 });
