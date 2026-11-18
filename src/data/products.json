@@ -2,7 +2,7 @@
   "products": [
     {
       "id": 1,
-      "name": "Juguete de dragón Charizard enojado de Pokemon",
+      "name": "Juguete de dragÃ³n Charizard enojado de Pokemon",
       "category": "figuras",
       "price": 2718,
       "description": "",
@@ -11,6 +11,19 @@
       "colorMode": "elegir",
       "size": "",
       "image": "https://makerworld.bblmw.com/makerworld/model/USccef8767d0dba8/1110819516/instance/817d1a8f4bc84ea5.jpg",
+      "featured": false
+    },
+    {
+      "id": 2,
+      "name": "Bulbasaur Multicolor",
+      "category": "figuras",
+      "price": 6666,
+      "description": "",
+      "material": "PLA",
+      "color": "",
+      "colorMode": "fijo",
+      "size": "",
+      "image": "https://makerworld.bblmw.com/makerworld/model/US17cf8a95553c06/46562437/instance/2024-02-01_9bc4f4fc90b9c.jpg",
       "featured": false
     }
   ]
