@@ -122,6 +122,10 @@
       if (h1) data.name = h1.textContent.trim();
     }
     if (!data.image) {
+      const og = document.querySelector('meta[property="og:image"]');
+      if (og) data.image = og.getAttribute('content') || data.image;
+    }
+    if (!data.image) {
       const imgs = Array.from(document.querySelectorAll('img'));
       const bigImg = imgs.find((img) => {
         const w = img.naturalWidth || img.width;
