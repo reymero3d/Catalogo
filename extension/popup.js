@@ -122,9 +122,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (openCalcBtn) {
     openCalcBtn.addEventListener('click', async () => {
       try { await navigator.clipboard.writeText(JSON.stringify(data, null, 2)); } catch (e) {}
-      chrome.tabs.create({ url: 'https://reymero3d.github.io/Calculadora-3D-/index.html' });
+      const p = new URLSearchParams({
+        name: data.name || '',
+        image: data.image || '',
+        grams: data.grams || 0,
+        hours: data.hours || 0,
+        minutes: data.minutes || 0,
+        url: data.url || '',
+      });
+      chrome.tabs.create({ url: 'https://reymero3d.github.io/Calculadora-3D-/index.html?' + p.toString() });
       const sm = document.getElementById('statusMsg');
-      if (sm) sm.textContent = 'Datos copiados. En la calculadora usá "Pegar desde portapapeles".';
+      if (sm) sm.textContent = 'Abriendo calculadora con los datos...';
     });
   }
 });
