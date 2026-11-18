@@ -136,13 +136,34 @@
       if (og) data.image = og.getAttribute('content') || data.image;
     }
     if (!data.image) {
+      // Buscar en srcset / data-src / lazy
       const imgs = Array.from(document.querySelectorAll('img'));
-      const bigImg = imgs.find((img) => {
-        const w = img.naturalWidth || img.width;
-        const h = img.naturalHeight || img.height;
-        return w >= 200 && h >= 200 && img.src && !img.src.includes('avatar') && !img.src.includes('icon');
+      let best = null;
+      imgs.forEach((img) => {
+        const src = img.currentSrc || img.src || img.getAttribute('data-src') || img.getAttribute('data-original') || '';
+        if (!src || src.includes('avatar') || src.includes('icon') || src.includes('logo')) return;
+        const w = img.naturalWidth || img.width || 0;
+        const h = img.naturalHeight || img.height || 0;
+        const area = w * h;
+        if (!best || area > best.area) { best = { src, area }; }
       });
-      if (bigImg) data.image = bigImg.src;
+      if (best && best.src) data.image = best.src;
+    }
+    if (!data.image) {
+      // Background images
+      const nodes = Array.from(document.querySelectorAll('*'));
+      let bestBg = null;
+      nodes.forEach((n) => {
+        const bg = getComputedStyle(n).backgroundImage;
+        if (bg && bg !== 'none') {
+          const m = bg.match(/url\(["']?(https?:\/\/[^"')]+)["']?\)/i);
+          if (m && !m[1].includes('avatar') && !m[1].includes('icon')) {
+            const area = (n.clientWidth || 0) * (n.clientHeight || 0);
+            if (!bestBg || area > bestBg.area) bestBg = { src: m[1], area };
+          }
+        }
+      });
+      if (bestBg) data.image = bestBg.src;
     }
 
     return data;
