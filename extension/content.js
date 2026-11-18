@@ -121,6 +121,16 @@
       const h1 = document.querySelector('h1');
       if (h1) data.name = h1.textContent.trim();
     }
+    // Fallback: buscar cualquier URL de imagen en el JSON
+    if (!data.image) {
+      try {
+        const nextScript = document.getElementById('__NEXT_DATA__');
+        if (nextScript) {
+          const m = nextScript.textContent.match(/https?:\/\/[^"'\s]+\.(?:jpg|jpeg|png|webp)/i);
+          if (m) data.image = m[0];
+        }
+      } catch (e) {}
+    }
     if (!data.image) {
       const og = document.querySelector('meta[property="og:image"]');
       if (og) data.image = og.getAttribute('content') || data.image;
