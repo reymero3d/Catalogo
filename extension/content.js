@@ -36,7 +36,7 @@
 
       // Nombre e imagen del modelo
       data.name = design.title || data.name;
-      data.image = design.coverUrl || design.coverPortrait || data.image;
+      data.image = design.coverUrl || design.coverPortrait || design.cover || design.previewUrl || design.thumbnail || data.image;
 
       const instances = design.instances || [];
       data.debug.totalInstances = instances.length;
@@ -68,7 +68,7 @@
       const chosen = candidates.find((i) => i.isDefault) || candidates[0];
       if (chosen) {
         data.name = design.title;
-        data.image = chosen.cover || design.coverUrl || data.image;
+        data.image = chosen.cover || chosen.preview || chosen.coverUrl || design.coverUrl || design.coverPortrait || design.cover || data.image;
         data.grams = chosen.weight || 0;
 
         // Tiempo de impresión: buscar en prediction, extention, o campos de tiempo
