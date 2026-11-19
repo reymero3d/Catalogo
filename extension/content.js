@@ -44,10 +44,23 @@
       // Listar todos los perfiles con info relevante
       data.debug.allInstances = instances.map((inst) => {
         const ext = inst.extention || {};
+        // Colores
+        let colors = 0;
+        const cands = [ext.instanceSetting, ext.modelInfo, ext, inst];
+        for (const c of cands) {
+          if (c && typeof c === 'object') {
+            if (Array.isArray(c.colors)) { colors = c.colors.length; break; }
+            if (Array.isArray(c.filaments)) { colors = c.filaments.length; break; }
+            if (Array.isArray(c.colorList)) { colors = c.colorList.length; break; }
+            if (typeof c.colorCount === 'number') { colors = c.colorCount; break; }
+            if (typeof c.colors === 'number' && c.colors > 0) { colors = c.colors; break; }
+          }
+        }
         return {
           title: inst.title,
           weight: inst.weight,
           prediction: inst.prediction,
+          colors: colors || 1,
           machineName: (inst.lacInfo && inst.lacInfo.machineName) || '',
           extentionKeys: Object.keys(ext),
           extentionData: Object.fromEntries(
@@ -70,6 +83,23 @@
         data.name = design.title;
         data.image = chosen.cover || chosen.preview || chosen.coverUrl || design.coverUrl || design.coverPortrait || design.cover || data.image;
         data.grams = chosen.weight || 0;
+
+        // Colores: buscar en extention/modelInfo/instanceSetting o campos de color
+        (function () {
+          const ext = chosen.extention || {};
+          const candidates = [ext.instanceSetting, ext.modelInfo, ext, chosen, design];
+          let found = 0;
+          for (const c of candidates) {
+            if (c && typeof c === 'object') {
+              if (Array.isArray(c.colors)) { found = c.colors.length; break; }
+              if (Array.isArray(c.filaments)) { found = c.filaments.length; break; }
+              if (Array.isArray(c.colorList)) { found = c.colorList.length; break; }
+              if (typeof c.colorCount === 'number') { found = c.colorCount; break; }
+              if (typeof c.colors === 'number' && c.colors > 0) { found = c.colors; break; }
+            }
+          }
+          if (found > 0) data.colors = found;
+        })();
 
         // Tiempo de impresión: buscar en prediction, extention, o campos de tiempo
         // prediction puede ser segundos

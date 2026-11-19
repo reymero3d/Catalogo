@@ -80,6 +80,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const prof = allProfiles[idx];
       if (prof) {
         data.grams = prof.weight || data.grams;
+        if (prof.colors) data.colors = prof.colors;
         // Tiempo
         if (typeof prof.prediction === 'number' && prof.prediction > 0) {
           data.hours = Math.floor(prof.prediction / 3600);
@@ -128,6 +129,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         grams: data.grams || 0,
         hours: data.hours || 0,
         minutes: data.minutes || 0,
+        colors: data.colors || 1,
         url: data.url || '',
       });
       chrome.tabs.create({ url: 'https://reymero3d.github.io/Calculadora-3D-/index.html?' + p.toString() });
