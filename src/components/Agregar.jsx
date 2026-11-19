@@ -124,7 +124,7 @@ export default function Agregar({ onNavigate }) {
       })
       if (!getRes.ok) throw new Error('No se pudo leer products.json: ' + getRes.status)
       const fileData = await getRes.json()
-      const currentContent = JSON.parse(atob(fileData.content))
+      const currentContent = JSON.parse(decodeURIComponent(escape(atob(fileData.content))))
       const products = currentContent.products || []
 
       // 2. Generar nuevo ID
